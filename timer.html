@@ -1,0 +1,151 @@
+<html>
+
+<head>
+    <link href="https://fonts.googleapis.com/css?family=Oswald:400,700" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <style type="text/css">
+        * {
+            padding: 0px;
+            margin: 0px;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        body {
+            background-color: green;
+            color: #fff
+        }
+
+        select {
+            padding: 0px 30px;
+            width: 250px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: url("https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-arrow-down-b-128.png ") white no-repeat 110% !important;
+            background: url("https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-arrow-down-b-128.png ") white no-repeat calc(110%) !important;
+            border: 1px #666 solid;
+        }
+
+        button {
+            padding: 0px 50px;
+            margin-left: 100px;
+            text-transform: uppercase;
+        }
+        #input_pane {
+            width: 1170px;
+            padding: 30px;
+            margin: 300px auto 0px auto;
+            border: 10px #222 solid;
+            display: block;
+            font-size: 85px;
+            background-color: #333;
+        }
+
+        #input_pane * {
+            font-size: 85px;
+        }
+
+        #display_pane {
+            display: none;
+            text-align:left;
+        }
+        #display_screen{           
+            display:inline-block;            
+            line-height: 100%;
+        }
+    </style>
+    <script type="text/javascript">
+        var target_time;
+        var countdown_timer;
+        var timer_char_length=0;
+
+        function init_page() {
+           
+            create_options('hr', 0, 5);
+            create_options('min', 0, 60);           
+        }
+        function create_options(id, min, max) {          
+            var i, option;
+            for (i = min; i <= max; i += 1) {
+                $('#'+id).append('<option value="' + i + '">' + i + '</option>');
+            }
+        }
+
+        function set_target_time() {
+            target_time = new Date(Date.parse(new Date()) + ( parseInt($("#hr").val()) * 60 * 60 + parseInt($("#min").val()) * 60) * 1000);
+            $("#input_pane").css({'display':'none'});
+            $("#display_pane").css({'display':'block'});
+        }
+
+        window.onload = function () {
+            init_page();
+            document.getElementById("btn_start").onclick = start_countdown;            
+        }
+
+        function start_countdown(){
+           set_target_time();           
+           setTimeout(function(){countdown_timer = setInterval(set_timer, 1000);}, 1000);
+           
+        }
+
+        function set_timer() {
+            
+            var time_elapsed = target_time.getTime() - new Date().getTime();           
+            var hours = Math.floor((time_elapsed % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((time_elapsed % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((time_elapsed % (1000 * 60)) / 1000);
+
+            var current_time =  (hours != 0 ? pad_zero(hours) + ':' : '') + pad_zero(minutes) + ':' + pad_zero(seconds);            
+            $("#display_screen").html(current_time);
+            if (current_time.length != timer_char_length) {
+                set_screen_font_size();
+                timer_char_length = current_time.length;
+            }
+            if (time_elapsed < 2 * 60 * 1000) {
+                change_background('#FF8106');
+            }
+            if (time_elapsed < 1000) {
+                clearInterval(countdown_timer);
+                change_background('#FF0000');
+                $("#display_screen").html("TIME'S UP!");
+            }
+        }
+
+        function pad_zero(str) {
+            str = str.toString();
+            while (str.length < 2) { str = "0" + str; }
+            return str;
+        }
+
+        function change_background(color) {
+            document.body.style.background = color;
+        }
+
+        function set_screen_font_size()
+        {
+            var screen_font_size=12;           
+            while(window.screen.availWidth - $('#display_screen').width() > (window.screen.availWidth * 20 /100))
+            {
+                screen_font_size++;
+                $("#display_screen").css({'font-size': screen_font_size + 'px'});
+            }
+            $("#display_screen").css({'margin-left': (window.screen.availWidth * 20 /100)/2});
+            var top_margin = (window.screen.availHeight - $('#display_screen').height())/2 + 'px';           
+            $("#display_screen").css({'margin-top': top_margin});
+        }
+    </script>
+</head>
+
+<body>
+    <div id="input_pane">
+        <select id="hr"></select> Hr
+        <select id="min"></select> Min
+        <button id="btn_start">Start</button>
+    </div>
+    <div id="display_pane">
+        <span id="display_screen"></span>                   
+    </div>
+    
+</body>
+
+</html>
